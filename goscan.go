@@ -42,7 +42,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Usage: %s [host] [firstport] [lastport]", os.Args[0])
         os.Exit(1)
     }
-    fmt.Println("Scanning ", host, ", ports ", fpst, " - ", lpst)
+    fmt.Println("Scanning ", addr, ", ports ", fpst, " - ", lpst)
 
     d := &net.Dialer{Timeout: 150 * time.Millisecond}
     sem := make(chan bool, 100);
