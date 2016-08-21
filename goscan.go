@@ -5,7 +5,12 @@ import (
     "os"
     "fmt"
     "time"
+    "strconv"
 )
+
+var addr string = os.Args[1]
+var fpst string = os.Args[2]
+var lpst string = os.Args[3]
 
 type TicToc struct {
     tic time.Time
@@ -25,18 +30,24 @@ func (ticToc * TicToc) Toc() time.Duration {
 
 func main() {
     var t TicToc
-
-    if len(os.Args) != 2 {
-        fmt.Fprintf(os.Stderr, "Usage: %s host", os.Args[0])
+    
+    fp, err := strconv.Atoi(fpst)
+    lp, err := strconv.Atoi(lpst)
+    if err != nil {
+        fmt.Println("Error: strconv.Atoi")
         os.Exit(1)
     }
-    service := os.Args[1]
-    fmt.Println("Scanning ", service, ", please wait...")
+
+    if len(os.Args) != 4 {
+        fmt.Fprintf(os.Stderr, "Usage: %s [host] [firstport] [lastport]", os.Args[0])
+        os.Exit(1)
+    }
+    fmt.Println("Scanning ", host, ", ports ", fpst, " - ", lpst)
 
     d := &net.Dialer{Timeout: 150 * time.Millisecond}
     sem := make(chan bool, 100);
     t.Tic()
-    for i := 1; i < 65536; i++ {
+    for i := fp; i < lp; i++ {
         sem <- true
         go func (host string, port int) {
             host_name := fmt.Sprintf("%s:%d", host, port)
@@ -47,7 +58,7 @@ func main() {
                 fmt.Printf("%d: open\n", port)
             }
             <-sem;
-        } (service, i);
+        } (addr, i);
     }
 
     for i := 0; i < cap(sem); i++ {
